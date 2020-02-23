@@ -7,7 +7,7 @@
  2. `cd Smart-contract-Onepiece-shop`
  3. `npm install`
  4. `npm start`
- 5. เปิดเว็บบราวเซอร์ http://localhost/
+ 5. `เปิดเว็บบราวเซอร์ http://localhost/`
 
 <img src="./README/img-001.png" width="80%"></img>
 
