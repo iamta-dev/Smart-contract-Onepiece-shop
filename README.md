@@ -14,8 +14,8 @@
 
  ### วิธีการใช้งาน
  1. เลือก Character เเละกดปุม BUY เเล้วกดปุ่ม confirm ใน MataMask เพื่อยืนยันการจ่าย ETH 
- <img src="./README/img-003.png" width="80%"></img>
+<img src="./README/img-003.png" width="80%"></img>
  2. รอ PANDING ... จนเสร็จ
- <img src="./README/img-004.png" width="80%"></img>
+<img src="./README/img-004.png" width="80%"></img>
  3. เลือก เมนู Character Owner เเละตรวจสอบ Character Owner ที่ Status จะเปลี่ยนเป็น Purchased
 <img src="./README/img-005.png" width="80%"></img>
