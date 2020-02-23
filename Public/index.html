@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Onepiece Shop</title>
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <script src="./node_modules/web3/dist/web3.min.js">
+    </script>
+    <script src="./node_modules\solidity-to-abi\dist\solidity-to-abi.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <!-- font-awesome CSS -->
+    <script src="fontawesome5/all.js"></script>
+</head>
+
+<body>
+    <nav class="navbar fixed-top navbar-expand-md navbar-dark " style="background-color: #1C2331;color: white;">
+        <div class="d-flex w-50 order-0">
+            <a class="navbar-brand" href="https://drive.google.com/file/d/1KlDmVZEYAa7U0KMyiriPOzSt2dkRX-nG/view">
+                <img src="logo/one-piece-logo.jpg" width="80" height="60"
+                    style="vertical-align: middle;border-radius: 60%; margin-right: 15px;">
+                <label style="font-size: 30px;">Onepiece Shop</label>
+            </a>
+        </div>
+        <ul class="navbar-nav mr-auto">
+        </ul>
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="http://localhost:80/" style="margin: 20px; font-size: 20px;">Character
+                    List</a>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link" href="http://localhost:80/Owner" style="margin: 20px; font-size: 20px;">Character
+                    Owner</a>
+            </li>
+        </ul>
+        <div style="padding: 0px;margin: 0px;">
+            <p class="badge badge-success" style="padding: 0px;margin: 0px;font-size: 20px;">My Wallet Address</p>
+            <p id="my-account" class="badge badge-warning"
+                style="padding: 0px;margin: 0px;font-size: 20px;width: 100px;"></p>
+        </div>
+
+
+
+    </nav>
+
+    <div class="container" style="margin-top: 100px;">
+
+        <div id="top-alert-green" class="alert alertMsg" role="alert">
+            xxxxx
+        </div>
+        <h1 class="pl-1">Onepiece Character List</h1>
+        <div id="character-list" class="card-list d-flex flex-wrap justify-content-center">
+        </div>
+        <h2 id="result"></h2>
+    </div>
+
+    <!-- Footer -->
+    <div class="navbar fixed-bottom" style="background-color: #1C2331;color: white;">
+        <footer>
+
+            <!-- Copyright -->
+            <div class="footer-copyright text-center py-3">© 2020 Copyright:
+                <a> Bingsu.com</a> | 523355 | CPE#22 | SUT#25
+            </div>
+            <!-- Copyright -->
+
+        </footer>
+    </div>
+    <!-- Footer -->
+    <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js">
+    </script> -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+    <script src="./config.js"></script>
+    <script>
+        $(".alertMsg").hide();
+        if (typeof web3 !== 'undefined') {
+            // this statement is executed if you are using 
+            // MetaMask 
+            async function enableAccounts() {
+                await ethereum.enable()
+            }
+            enableAccounts();
+        } else {
+            // set the provider you want from Web3.providers
+            web3 = new Web3(
+                new Web3.providers.HttpProvider(
+                    "http://localhost:8545"));
+        }
+
+        let abi = [
+            {
+                "name": "BuyCharacter",
+                "type": "event",
+                "payable": false,
+                "constant": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "type": "address",
+                        "name": "buyer"
+                    },
+                    {
+                        "indexed": false,
+                        "type": "uint256",
+                        "name": "characterId"
+                    }
+                ],
+                "outputs": []
+            },
+            {
+                "name": "CreateCharacter",
+                "type": "event",
+                "payable": false,
+                "constant": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "type": "address",
+                        "name": "creater"
+                    },
+                    {
+                        "indexed": false,
+                        "type": "uint256",
+                        "name": "characterId"
+                    }
+                ],
+                "outputs": []
+            },
+            {
+                "name": "ErrorCharacterNotAvailable",
+                "type": "event",
+                "payable": false,
+                "constant": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "type": "address",
+                        "name": "buyer"
+                    },
+                    {
+                        "indexed": false,
+                        "type": "uint256",
+                        "name": "characterId"
+                    }
+                ],
+                "outputs": []
+            },
+            {
+                "name": "ErrorNotEnoughMoney",
+                "type": "event",
+                "payable": false,
+                "constant": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "type": "address",
+                        "name": "buyer"
+                    },
+                    {
+                        "indexed": false,
+                        "type": "uint256",
+                        "name": "characterId"
+                    }
+                ],
+                "outputs": []
+            },
+            {
+                "name": "createCharacter ",
+                "type": "function",
+                "payable": false,
+                "constant": false,
+                "inputs": [
+                    {
+                        "type": "string",
+                        "name": "memory"
+                    },
+                    {
+                        "type": "uint256",
+                        "name": "_price"
+                    },
+                    {
+                        "type": "string",
+                        "name": "memory"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "type": "bool",
+                        "name": "success"
+                    }
+                ]
+            },
+            {
+                "name": "getAllCharacterList",
+                "type": "function",
+                "payable": false,
+                "constant": true,
+                "inputs": [],
+                "outputs": [
+                    {
+                        "type": "uint256[]",
+                        "name": "_characters"
+                    }
+                ],
+                "stateMutability": "view",
+            },
+            {
+                "name": "getMyCharacter",
+                "type": "function",
+                "payable": false,
+                "constant": false,
+                "inputs": [],
+                "outputs": [
+                    {
+                        "type": "uint256[]",
+                        "name": "character"
+                    }
+                ],
+                "stateMutability": "view",
+            },
+            {
+                "name": "buyCharacter",
+                "type": "function",
+                "payable": true,
+                "constant": false,
+                "inputs": [
+                    {
+                        "type": "uint256",
+                        "name": "_characterId"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "type": "bool",
+                        "name": "success"
+                    }
+                ]
+            },
+            {
+                "name": "getCharacterStrById",
+                "type": "function",
+                "payable": false,
+                "constant": false,
+                "inputs": [
+                    {
+                        "type": "uint256",
+                        "name": "_id"
+                    }
+                ],
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "id",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "price",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "status",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "seller",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "buyer",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "imgPath",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "view",
+            }
+        ];
+        var contract = web3.eth.contract(abi);
+        var myContract = contract.at(contractAddress);
+
+        // parse solidity method string
+        // const abi2 = solidityToABI('getCharacterById(uint256 _id) :(Character memory character)');
+        // console.log(abi2);
+
+        var completeEvent =
+            myContract.BuyCharacter();
+
+        var reloaded = false;
+        completeEvent.watch(function (error, result) {
+            if (!error) {
+                $('.alertMsg').removeClass("alert-warning");
+                $('.alertMsg').addClass("alert-success");
+                $('.alertMsg').text("Buy character success!!!");
+                $(".alertMsg").show().delay(5000).queue(function (n) {
+                    $(this).hide(); n();
+                });
+                if (!reloaded) {
+                    // location.reload(true);
+                    loadCharacterTable();
+                    reloaded = true;
+                }
+            } else {
+                console.log(error.message);
+            }
+
+        });
+
+        myContract.ErrorNotEnoughMoney().watch(function (error, result) {
+            if (!error) {
+                $('.alertMsg').removeClass("alert-warning");
+                $('.alertMsg').addClass("alert-danger");
+                $('.alertMsg').text("Not enough money!!!");
+                $(".alertMsg").show().delay(5000).queue(function (n) {
+                    $(this).hide(); n();
+                });
+            } else {
+                console.log(error.message);
+            }
+        })
+
+        myContract.ErrorCharacterNotAvailable().watch(function (error, result) {
+            if (!error) {
+                $('.alertMsg').removeClass("alert-warning");
+                $('.alertMsg').addClass("alert-danger");
+                $('.alertMsg').text("This character not available!!!");
+                $(".alertMsg").show().delay(5000).queue(function (n) {
+                    $(this).hide(); n();
+                });
+            } else {
+                console.log(error.message);
+            }
+        })
+
+
+        function buyFunction(_id, _price) {
+            reloaded = false;
+            console.log("id = " + _id + " price = " + _price);
+            myContract.buyCharacter(_id,
+                {
+                    gas: 3000000,
+                    from: web3.eth.accounts[0],
+                    value: _price + 1
+                },
+                (error, result) => {
+                    if (!error) {
+                        $('.alertMsg').show();
+                        $('.alertMsg').removeClass("alert-danger");
+                        $('.alertMsg').removeClass("alert-success");
+                        $('.alertMsg').addClass("alert-warning");
+                        $('.alertMsg').html(`<div class="spinner-border text-danger spinner-border-sm" role="status"></div>` + " Buy character pending");
+                    } else {
+                        console.log(error.message);
+                    }
+                });
+        }
+
+        $("#btnCheck").click(function () {
+            myContract.checkName($("#document2").val(),
+                (error, result) => {
+                    if (!error) {
+                        $("#result").html(result.toString());
+                    } else
+                        console.error(error);
+                });
+        });
+
+    </script>
+    <script>
+        function loadCharacterTable() {
+            $("#character-owner").empty().append();
+            $("#character-list").empty().append();
+            myContract.getAllCharacterList(
+                (error, result) => {
+                    if (!error) {
+                        $.each(result, function (index, value) {
+                            // console.log(value.c[0])
+                            myContract.getCharacterStrById(value.c[0], (error, result) => {
+                                if (!error) {
+                                    console.log(result)
+                                    $("#character-owner").append(
+                                        '<tr>' +
+                                        '<th scope="row">' + result[0].c[0] + '</th>' +
+                                        '<td>' + result[1] + '</td>' +
+                                        '<td>' + result[5] + '</td>' +
+                                        '<td>' + result[3] + '</td>' +
+                                        '</tr>'
+                                    );
+
+                                    $("#character-list").append(
+                                        `<div class="card rounded m-1 w-20" style="max-width: 500px;background-color: #1C2331;border: 4px solid black;">
+                                        <div class="row no-gutters">
+                                            <div class="col-md-4">
+                                            <img src="./Img-one-piece/`+ result[6] + `" class="card-img" alt="...">
+                                            </div>
+                                            <div class="col-md-8">
+                                            <div class="card-body">
+                                                </br>
+                                                </br>
+                                                <div style="background-color: #FFC300;">
+                                                <h2 style="text-align: center">`+ result[1] + `</h2>    
+                                                </div>
+                                                <p class="card-text"></p>
+                                                <button id="btnBuy" onClick="buyFunction(`+ result[0].c[0] + `,` + result[2].c[0] + `)" value="` + result[2].c[0] + `" class="${result[3] == "Available" ? "btn-success" : "btn-secondary"} btn-block btn btn-lg "> <i class="fas fa-shopping-cart"></i> Buy ` + result[2].c[0] + ` wei (ETH)</button>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </div>`
+                                    )
+                                } else {
+                                    console.log(error);
+                                }
+                            })
+                        });
+                    } else
+                        console.error(error);
+                });
+        };
+        $(document).ready(function () {
+            loadCharacterTable();
+            $("#my-account").html(web3.eth.defaultAccount)
+        });
+    </script>
+</body>
+
+</html>
